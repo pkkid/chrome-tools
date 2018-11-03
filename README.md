@@ -13,4 +13,4 @@ My New Tab is released under the [MIT license](http://bit.ly/mit-license).
 You *may not* redistribute this software without proper attribution.
 
 * jQuery code is [MIT Licensed](https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt). 
-* MDI Icons is licensed under [SIL Open Font License](https://github.com/cleandersonlobo/mdi-icons/blob/master/MaterialDesign-MDI/license.md#sil-open-font-license-version-11---26-february-2007)
+* MDI Icons are licensed under [SIL Open Font License](https://github.com/cleandersonlobo/mdi-icons/blob/master/MaterialDesign-MDI/license.md#sil-open-font-license-version-11---26-february-2007).
