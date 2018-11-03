@@ -1,0 +1,15 @@
+{
+  "manifest_version": 2,
+  "name": "My New Tab",
+  "short_name": "NewTab",
+  "description": "Allows choosing any URL when opening a new tab.",
+  "version": "1.0",
+  "options_page":"options.html",
+  "chrome_url_overrides": {
+    "newtab": "main.html"
+  },
+  "permissions": ["storage"],
+  "optional_permissions": ["tabs", "topSites", "management", "bookmarks"],
+  "incognito": "split",
+  "minimum_chrome_version" : "22"
+}
