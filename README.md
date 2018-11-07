@@ -1,6 +1,6 @@
 # My New Tab
 
-Google Chrome extensions that allows you to set a custom URL to the new tab page. The newtab
+Google Chrome extension that allows you to set a custom URL to the new tab page. The newtab
 page can be redirected to the specified page or loaded within an iframe for a cleaner omnibar
 if the resulting server supports it. You can also design your own local html file and use
 that as the newtab page using a URL starting with file://.
