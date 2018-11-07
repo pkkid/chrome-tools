@@ -1,4 +1,4 @@
-# My New Tab
+# PKs New Tab Redirect
 
 Google Chrome extension that allows you to set a custom URL to the new tab page. The newtab
 page can be redirected to the specified page or loaded within an iframe for a cleaner omnibar
