@@ -1,15 +1,20 @@
 {
   "manifest_version": 2,
-  "name": "PKs New Tab Redirect",
-  "short_name": "PKs New Tab Redirect",
-  "description": "Allows choosing any URL when opening a new tab.",
-  "version": "1.0",
-  "options_page":"options.html",
-  "chrome_url_overrides": {
-    "newtab": "main.html"
+  "name": "PKs Tab Tools",
+  "short_name": "PKs Tab Tools",
+  "version": "2.0",
+  "description": "Tab tools to make using chrome better.",
+  "permissions": ["bookmarks", "management", "storage", "tabs", "topSites"],
+  "options_page": "options.html",
+  "chrome_url_overrides": {"newtab": "main.html"},
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "128": "img/tab128.png",
+      "64": "img/tab64.png",
+      "32": "img/tab32.png"
+    }
   },
-  "permissions": ["storage"],
-  "optional_permissions": ["tabs", "topSites", "management", "bookmarks"],
   "incognito": "split",
   "minimum_chrome_version" : "22"
 }
