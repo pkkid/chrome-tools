@@ -2,11 +2,22 @@
 // Chrome New Tab Options
 'use strict';
 
+var save_setting = function(key, value, callback) {
+  var data = {};
+  data[key] = value;
+  chrome.storage.sync.set(data, function() {
+    if (!chrome.runtime.lastError) {
+      console.log('Saved', key, value);
+      if (callback) { callback(); }
+    }
+  });
+};
+
 
 //------------------------------
 // New Tab Options
 //------------------------------
-var newTab = {
+var NewTab = {
 
   init_newtab: function() {
     if ($('#main').length) {
@@ -36,10 +47,10 @@ var newTab = {
     }
     // Save new values to storage when modified
     $('#url').on('blur', function() {
-      self.save_setting('url', $(this).val());
+      save_setting('url', $(this).val());
     });
     $('#iframe').on('change', function() {
-      self.save_setting('iframe', $(this).is(':checked'));
+      save_setting('iframe', $(this).is(':checked'));
     });
     // Update URL when clicking special chrome link
     $('.special.help a').on('click', function() {
@@ -47,26 +58,15 @@ var newTab = {
     });
   },
 
-  save_setting: function(key, value) {
-    var data = {}
-    data[key] = value;
-    chrome.storage.sync.set(data, function() {
-      if (!chrome.runtime.lastError) {
-        console.log('Saved', key, value);
-      }
-    });
-  },
 };
 
 
 //------------------------------
 // Tab Groups
 //------------------------------
-var tabGroups = {
+var TabGroups = {
 
   init: function() {
-    var windowid = null;
-    chrome.windows.getCurrent(function(win) { windowid = win.id; });
     this.init_triggers();
     this.init_popup();
   },
@@ -88,65 +88,50 @@ var tabGroups = {
       }
     });
     // Toggle the actions row on a Tab Group
-    $('.loadarea').on('click', '.row .actionsbtn', function(event) {
+    $('.groups').on('click', '.row .actionsbtn', function(event) {
       event.preventDefault();
-      $(this).parents('.row').find('.actions').slideToggle('fast');
+      var row = $(this).parents('.row');
+      row.siblings().find('.actions').slideUp('fast');
+      row.find('.actions').slideToggle('fast');
     });
     // Load the specified Tab Group
-    $('.loadarea').on('click', '.row .name', function(event) {
+    $('.groups').on('click', '.row .name', function(event) {
       event.preventDefault();
-      self.load_group($(this).parents('.row').data('id'));
+      self.load_group($(this).parents('.row').data('key'));
     });
     // Update the specified Tab Group
-    $('.loadarea').on('click', 'button.update', function(event) {
+    $('.groups').on('click', 'button.update', function(event) {
       event.preventDefault();
       console.log($(this).parents('.row').data('name'));
       self.save_group($(this).parents('.row').data('name'));
     });
     // Delete the specified Tab Group
-    $('.loadarea').on('click', 'button.delete', function(event) {
+    $('.groups').on('click', 'button.delete', function(event) {
       event.preventDefault();
-      self.delete_group($(this).parents('.row').data('id'));
+      self.delete_group($(this).parents('.row').data('key'));
     });
   },
 
   // Load all Saved Groups in the popup window
   init_popup: function() {
-    var self = this;
     chrome.storage.sync.get(null, function(groups) {
-      chrome.storage.local.get('activeTabs', function(result) {
-        var active = result.activeTabs ? result.activeTabs[self.windowid] : null;
-        for (var id in groups) {
-          if (groups.hasOwnProperty(id)) {
-            var row = groups[id];
-            var isactive = active === id ? 'active' : '';
-            var template = [
-              '<div class="row '+isactive+'" data-id="'+id+'" data-name="'+row.name+'">',
-              '  <div class="actionsbtn">&#8942;</div>',
-              '  <div class="name"><span class="mdi mdi-tab"></span>'+ row.name +'</div>',
-              '  <div class="actions" style="display:none;">',
-              '    <button class="delete">delete</button>',
-              '    <button class="update">update</button>',
-              '  </div>',
-              '</div>'
-            ].join('\n');
-            $('.loadarea').append(template);
-          }
+      $('.groups').html('');
+      for (var key in groups) {
+        if (key.startsWith('group_')) {
+          var row = groups[key];
+          var template = [
+            '<div class="row" data-key="'+key+'" data-name="'+row.name+'">',
+            '  <div class="actionsbtn">&#8942;</div>',
+            '  <div class="name"><span class="mdi mdi-tab"></span>'+ row.name +'</div>',
+            '  <div class="actions" style="display:none;">',
+            '    <button class="delete">delete</button>',
+            '    <button class="update">update</button>',
+            '  </div>',
+            '</div>'
+          ].join('\n');
+          $('.groups').append(template);
         }
-      });
-    });
-  },
-
-  // Set the Active Tab Group
-  set_active: function(uid) {
-    var self = this;
-    chrome.storage.local.get(['activeTabs'], function(result) {
-      var atabs = result.activeTabs || {};
-      atabs[self.windowid] = uid;
-      chrome.storage.local.set({'activeTabs': atabs}, function() {
-        console.log('Active tabset: '+ uid);
-        window.location.href = 'popup.html';
-      });
+      }
     });
   },
 
@@ -154,17 +139,13 @@ var tabGroups = {
   save_group: function(name) {
     var self = this;
     if (name) {
-      var urilist = [];
-      chrome.tabs.query({pinned:true, currentWindow:true}, function(tabs) {
-        for (var i=0; i < tabs.length; i++) {
-          urilist[i] = tabs[i].url;
-        }
-        if (urilist.length > 0) {
-          var saveobj = {};
-          var id = window.btoa(name);
-          saveobj[id] = {name:name, tabs:urilist};
-          chrome.storage.sync.set(saveobj, function() {
-            self.set_active(id);
+      chrome.tabs.query({pinned:true, currentWindow:true}, function(pinned) {
+        var urls = pinned.map(tab => tab.url);
+        if (urls.length > 0) {
+          var key = 'group_'+ window.btoa(name);
+          save_setting(key, {name:name, tabs:urls}, function() {
+            $('.saverow input').val('');
+            self.init_popup(); 
           });
         }
       });
@@ -176,14 +157,11 @@ var tabGroups = {
     var self = this;
     chrome.storage.sync.get(id, function(group) {
       var tabs = group[id].tabs;
-      chrome.tabs.query({pinned:true, windowId:self.windowid}, function(curtabs) {
-        var list = [];
-        for (var tab of curtabs) {
-          list.push(tab.id);
-        }
-        chrome.tabs.remove(list);
-        for (tab of tabs) {
-          chrome.tabs.create({windowId:self.windowid, url:tab, active:false, pinned:true});
+      chrome.tabs.query({pinned:true}, function(pinned) {
+        var pinned_ids = pinned.map(tab => tab.id);
+        chrome.tabs.remove(pinned_ids);
+        for (var tab of tabs) {
+          chrome.tabs.create({url:tab, active:false, pinned:true});
         }
         console.log('Loaded tabs for id: '+ id);
         self.set_active(id);
@@ -193,8 +171,9 @@ var tabGroups = {
 
   // Delete a Tab Group
   delete_group: function(id) {
+    var self = this;
     chrome.storage.sync.remove(id, function() {
-      window.location.href = 'popup.html';
+      self.init_popup();
     });
   },
 
@@ -202,6 +181,6 @@ var tabGroups = {
 
 
 // Main
-if ($('#main').length) { newTab.init_newtab(); }
-if ($('#options').length) { newTab.init_options(); }
-if ($('#popup').length) { tabGroups.init(); }
+if ($('#main').length) { NewTab.init_newtab(); }
+if ($('#options').length) { NewTab.init_options(); }
+if ($('#popup').length) { TabGroups.init(); }
