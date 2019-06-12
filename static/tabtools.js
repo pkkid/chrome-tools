@@ -157,7 +157,7 @@ var TabGroups = {
     var self = this;
     chrome.storage.sync.get(id, function(group) {
       var tabs = group[id].tabs;
-      chrome.tabs.query({pinned:true}, function(pinned) {
+      chrome.tabs.query({pinned:true, currentWindow:true}, function(pinned) {
         var pinned_ids = pinned.map(tab => tab.id);
         chrome.tabs.remove(pinned_ids);
         for (var tab of tabs) {
