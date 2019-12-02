@@ -197,9 +197,54 @@ var TabGroups = {
 var Background = {
 
   init: function() {
-    console.log('Background!');
+    var self = this;
+    this.import_active = false;
+    this.sort_timer = 0;
+    this.init_triggers();
+    setInterval(function() { self.sort_bookmarks(self); }, 1000);
   },
 
+  init_triggers: function() {
+    var self = this;
+    chrome.bookmarks.onImportBegan.addListener(function() {
+      console.log('Import active');
+      self.import_active = true;
+      self.sort_timer = 0;
+    });
+    chrome.bookmarks.onImportEnded.addListener(function() {
+      console.log('Import ended');
+      self.import_active = false;
+      self.sort_timer = 45;
+    });
+    chrome.bookmarks.onMoved.addListener(function(id, moveInfo) {
+      console.log('Bookmark moved');
+      self.sort_timer = 45;
+    });
+    chrome.bookmarks.onCreated.addListener(function(id, bookmark) {
+      console.log('Bookmark created');
+      self.sort_timer = 45;
+    });
+    chrome.bookmarks.onChanged.addListener(function(id, changeInfo) {
+      console.log('Bookmark changed');
+      self.sort_timer = 45;
+    });
+    chrome.bookmarks.onMoved.addListener(function(id, moveInfo) {
+      console.log('Bookmark moved');
+      self.sort_timer = 45;
+    });
+    chrome.bookmarks.onChildrenReordered.addListener(function(id, reorderInfo) {
+      console.log('Bookmark reordered');
+      self.sort_timer = 45;
+    });
+  },
+
+  sort_bookmarks: function(self) {
+    self.sort_timer = Math.max(-1, self.sort_timer-1);
+    console.log('Check sort', self.sort_timer);
+    if (self.sort_timer == 0) {
+      console.log('Sort Everything!');
+    }
+  },
 };
 
 
