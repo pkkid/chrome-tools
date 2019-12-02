@@ -51,7 +51,7 @@ article {
 .settings-box .mdi {
   display: block;
   position: absolute;
-  top: 15px;
+  top: 12px;
   left: 15px;
   font-size: 18px;
   color: rgba(0,0,0,0.8);
@@ -110,7 +110,7 @@ button:focus { outline: 0; }
   display: inline-block;
   width: 28px;
   height: 12px;
-  top: 15px;
+  top: 17px;
   right: 25px;
 }
 .switch input {
@@ -150,6 +150,69 @@ input:checked + .slider:before {
   transform: translateX(18px);
   background-color: #2978E2;
 }
+
+/* Sort Options */
+#sort_delay {
+  position: absolute;
+  display: inline-block;
+  width: 60px;
+  height: 22px;
+  top: 12px;
+  right: 22px;
+  border-radius: 20px;
+  border-width: 0px;
+  background-color: #F1F3F4;
+  padding: 0px 5px;
+  color: #46a;
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 24px;
+  padding-left: 10px;
+}
+.seconds {
+  position: absolute;
+  display: inline-block;
+  width: 28px;
+  height: 12px;
+  top: 15px;
+  right: 40px;
+  color: #46a;
+  font-size: 13px;
+  font-weight: bold;
+}
+.toplevel,
+.sublevel {
+  position: absolute;
+  display: inline-block;
+  width: 80px;
+  height: 12px;
+  top: 15px;
+  right: 360px;
+}
+.sublevel {
+  right: 142px;
+}
+.sort, .sortsub {
+  position: absolute;
+  display: inline-block;
+  width: 120px;
+  height: 22px;
+  top: 11px;
+  right: 250px;
+  border-radius: 20px;
+  border-width: 0px;
+  background-color: #F1F3F4;
+  padding: 0px 10px;
+  color: #46a;
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 24px;
+}
+.sortsub {
+  right: 22px;
+}
+
+
 
 /* Popup Window */
 #popup { width: 200px; }

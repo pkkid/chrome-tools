@@ -41,21 +41,28 @@ var NewTab = {
     // Load initial values from storage
     if ($('#options').length) {
       chrome.storage.sync.get(['url','iframe'], function(result) {
+        console.log(result);
         $('#url').val(result.url || '');
         $('#iframe').attr('checked', result.iframe || false);
+        $('#sort_delay').attr('value', result.sort_delay || 45);
+        $('#folders_first').attr('checked', result.folders_first || false);
+        
       });
     }
     // Save new values to storage when modified
-    $('#url').on('blur', function() {
-      save_setting('url', $(this).val());
-    });
-    $('#iframe').on('change', function() {
-      save_setting('iframe', $(this).is(':checked'));
-    });
-    // Update URL when clicking special chrome link
-    $('.special.help a').on('click', function() {
-      $('#url').val($(this).text()).trigger('blur');
-    });
+    $('#url').on('blur', function() { save_setting('url', $(this).val()); });
+    $('#iframe').on('change', function() { save_setting('iframe', $(this).is(':checked')); });
+    $('.special.help a').on('click', function() { $('#url').val($(this).text()).trigger('blur'); });
+    // Bookmark sort options
+    $('#sort_delay').on('change', function() { save_setting('sort_delay', $(this).val()); });
+    $('#folders_first').on('change', function() { save_setting('folders_first', $(this).is(':checked')); });
+    $('#bookmarks_sort').on('change', function() { save_setting('bookmarks_sort', $(this).val()); });
+    $('#bookmarks_sub').on('change', function() { save_setting('bookmarks_sub', $(this).val()); });
+    $('#mobile_sort').on('change', function() { save_setting('mobile_sort', $(this).val()); });
+    $('#mobile_sub').on('change', function() { save_setting('mobile_sub', $(this).val()); });
+    $('#other_sort').on('change', function() { save_setting('other_sort', $(this).val()); });
+    $('#other_sub').on('change', function() { save_setting('other_sub', $(this).val()); });
+
   },
 
 };
@@ -163,8 +170,8 @@ var TabGroups = {
         for (var tab of tabs) {
           chrome.tabs.create({url:tab, active:false, pinned:true});
         }
-        console.log('Loaded tabs for id: '+ id);
-        self.set_active(id);
+        console.log('Loaded tabs for idX: '+ id);
+        window.close();
       });
     });
   },
@@ -179,8 +186,20 @@ var TabGroups = {
 
 };
 
+//------------------------------
+// Background
+//------------------------------
+var Background = {
+
+  init: function() {
+    console.log('Background!');
+  },
+
+};
+
 
 // Main
 if ($('#main').length) { NewTab.init_newtab(); }
 if ($('#options').length) { NewTab.init_options(); }
 if ($('#popup').length) { TabGroups.init(); }
+if ($('#background').length) { Background.init(); }
