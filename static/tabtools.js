@@ -38,15 +38,21 @@ var NewTab = {
 
   init_options: function() {
     var self = this;
+    var options = ['url','iframe', 'sort_delay', 'folders_first'];
     // Load initial values from storage
     if ($('#options').length) {
-      chrome.storage.sync.get(['url','iframe'], function(result) {
+      chrome.storage.sync.get(null, function(result) {
         console.log(result);
         $('#url').val(result.url || '');
         $('#iframe').attr('checked', result.iframe || false);
         $('#sort_delay').attr('value', result.sort_delay || 45);
-        $('#folders_first').attr('checked', result.folders_first || false);
-        
+        $('#folders_first').attr('checked', result.folders_first || true);
+        $('#bookmarks_sort').val(result.bookmarks_sort || 'none');
+        $('#bookmarks_sub').val(result.bookmarks_sub || 'none');
+        $('#mobile_sort').val(result.mobile_sort || 'none');
+        $('#mobile_sub').val(result.mobile_sub || 'none');
+        $('#other_sort').val(result.other_sort || 'none');
+        $('#other_sub').val(result.other_sub || 'none');
       });
     }
     // Save new values to storage when modified
@@ -62,7 +68,6 @@ var NewTab = {
     $('#mobile_sub').on('change', function() { save_setting('mobile_sub', $(this).val()); });
     $('#other_sort').on('change', function() { save_setting('other_sort', $(this).val()); });
     $('#other_sub').on('change', function() { save_setting('other_sub', $(this).val()); });
-
   },
 
 };
