@@ -15,30 +15,10 @@ var save_setting = function(key, value, callback) {
 
 
 //------------------------------
-// New Tab Options
+// Options
 //------------------------------
-var NewTab = {
-
-  init_newtab: function() {
-    if ($('#main').length) {
-      chrome.storage.sync.get(['url','iframe'], function(result) {
-        var url = result.url || 'chrome://apps/';
-        var iframe = result.iframe || false;
-        if (url.startsWith('chrome://')) {
-          chrome.tabs.create({'url': url});
-          window.close();
-        } else if (iframe) {
-          $('#iframe').attr('src', url);
-        } else {
-          window.top.location = url;
-        }
-      });
-    }
-  },
-
-  init_options: function() {
-    var self = this;
-    var options = ['url','iframe', 'sort_delay', 'folders_first'];
+var Options = {
+  init: function() {
     // Load initial values from storage
     if ($('#options').length) {
       chrome.storage.sync.get(null, function(result) {
@@ -69,7 +49,27 @@ var NewTab = {
     $('#other_sort').on('change', function() { save_setting('other_sort', $(this).val()); });
     $('#other_sub').on('change', function() { save_setting('other_sub', $(this).val()); });
   },
+};
 
+
+//------------------------------
+// New Tab
+//------------------------------
+var NewTab = {
+  init: function() {
+    chrome.storage.sync.get(['url','iframe'], function(result) {
+      var url = result.url || 'chrome://apps/';
+      var iframe = result.iframe || false;
+      if (url.startsWith('chrome://')) {
+        chrome.tabs.create({'url': url});
+        window.close();
+      } else if (iframe) {
+        $('#iframe').attr('src', url);
+      } else {
+        window.top.location = url;
+      }
+    });
+  },
 };
 
 
@@ -198,58 +198,83 @@ var Background = {
 
   init: function() {
     var self = this;
-    this.import_active = false;
-    this.sort_timer = 0;
-    this.init_triggers();
-    setInterval(function() { self.sort_bookmarks(self); }, 1000);
+    chrome.storage.sync.get(null, function(result) {
+      self.sort_delay = result.sort_delay || 45;
+      self.folders_first = result.folders_first || true;
+      self.sort_options = [  // Options based on starting path
+        ['/Bookmarks bar/', result.bookmarks_sub || 'none'],
+        ['/Bookmarks bar', result.bookmarks_sort || 'none'],
+        ['/Mobile bookmarks/', result.mobile_sub || 'none'],
+        ['/Mobile bookmarks', result.mobile_sort || 'none'],
+        ['/Other bookmarks/', result.other_sub || 'none'],
+        ['/Other bookmarks', result.other_sort || 'none'],
+      ];
+      self.import_active = false;  // True when import is occuring
+      self.sort_timer = 1;  // Countdown to sort
+      self.init_triggers();
+      setInterval(function() { self.sort_everything(self); }, 1000);
+    });
   },
 
+  // Initialize all background triggers
   init_triggers: function() {
     var self = this;
-    chrome.bookmarks.onImportBegan.addListener(function() {
-      console.log('Import active');
-      self.import_active = true;
-      self.sort_timer = 0;
-    });
-    chrome.bookmarks.onImportEnded.addListener(function() {
-      console.log('Import ended');
-      self.import_active = false;
-      self.sort_timer = 45;
-    });
-    chrome.bookmarks.onMoved.addListener(function(id, moveInfo) {
-      console.log('Bookmark moved');
-      self.sort_timer = 45;
-    });
-    chrome.bookmarks.onCreated.addListener(function(id, bookmark) {
-      console.log('Bookmark created');
-      self.sort_timer = 45;
-    });
-    chrome.bookmarks.onChanged.addListener(function(id, changeInfo) {
-      console.log('Bookmark changed');
-      self.sort_timer = 45;
-    });
-    chrome.bookmarks.onMoved.addListener(function(id, moveInfo) {
-      console.log('Bookmark moved');
-      self.sort_timer = 45;
-    });
-    chrome.bookmarks.onChildrenReordered.addListener(function(id, reorderInfo) {
-      console.log('Bookmark reordered');
-      self.sort_timer = 45;
-    });
+    chrome.bookmarks.onImportBegan.addListener(function() { console.log('Import active'); self.import_active = true; });
+    chrome.bookmarks.onImportEnded.addListener(function() { console.log('Import ended'); self.import_active = false; self.sort_timer = self.sort_delay; });
+    chrome.bookmarks.onMoved.addListener(function() { console.log('Bookmark moved'); self.sort_timer = self.sort_delay; });
+    chrome.bookmarks.onCreated.addListener(function() { console.log('Bookmark created'); self.sort_timer = self.sort_delay; });
+    chrome.bookmarks.onChanged.addListener(function() { console.log('Bookmark changed'); self.sort_timer = self.sort_delay; });
+    chrome.bookmarks.onMoved.addListener(function() { console.log('Bookmark moved'); self.sort_timer = self.sort_delay; });
+    chrome.bookmarks.onChildrenReordered.addListener(function() { console.log('Bookmark reordered'); self.sort_timer = self.sort_delay; });
   },
 
-  sort_bookmarks: function(self) {
-    self.sort_timer = Math.max(-1, self.sort_timer-1);
-    console.log('Check sort', self.sort_timer);
-    if (self.sort_timer == 0) {
-      console.log('Sort Everything!');
+  // Get sort option for the specified path
+  get_sortby: function(path) {
+    for (var i=0; i<this.sort_options.length; i++) {
+      var prefix = this.sort_options[i][0];
+      var sortby = this.sort_options[i][1];
+      if (path.startsWith(prefix)) { return sortby; }
     }
+    return 'none';
+  },
+
+  // Sort all bookmarks in all folders
+  sort_everything: function(self) {
+    self.sort_timer = Math.max(-1, self.sort_timer-1);
+    if ((self.sort_timer == 0) && !self.import_active) {
+      console.log('Sort Everything!');
+      chrome.bookmarks.getTree(function(root) {
+        self.iter_folders('', root[0]);
+      });
+    }
+  },
+
+  // Iter Folders
+  iter_folders: function(path, folder) {
+    if (path != '') { this.sort_folder(path, folder); }
+    for (var i=0; i<folder.children.length; i++) {
+      var subfolder = folder.children[i];
+      var subpath = `${path}/${subfolder.title}`;
+      if (subfolder.url === undefined) {
+        this.iter_folders(subpath, subfolder);
+      }
+    }
+  },
+
+  // Sort Folder
+  sort_folder: function(path, folder) {
+    // check we want to sort this folder
+    var sortby = this.get_sortby(path);  
+    if (sortby == 'none') { return null; }
+    console.log(path, sortby, folder);
   },
 };
 
 
+//------------------------------
 // Main
-if ($('#main').length) { NewTab.init_newtab(); }
-if ($('#options').length) { NewTab.init_options(); }
+//------------------------------
+if ($('#main').length) { NewTab.init(); }
+if ($('#options').length) { Options.init(); }
 if ($('#popup').length) { TabGroups.init(); }
 if ($('#background').length) { Background.init(); }
