@@ -23,8 +23,6 @@ var Options = {
     if ($('#options').length) {
       chrome.storage.sync.get(null, function(result) {
         console.log(result);
-        $('#url').val(result.url || '');
-        $('#iframe').attr('checked', result.iframe || false);
         $('#sort_delay').attr('value', result.sort_delay || 45);
         $('#folders_first').attr('checked', result.folders_first || true);
         $('#bookmarks_sort').val(result.bookmarks_sort || 'none');
@@ -35,10 +33,6 @@ var Options = {
         $('#other_sub').val(result.other_sub || 'none');
       });
     }
-    // Save new values to storage when modified
-    $('#url').on('blur', function() { save_setting('url', $(this).val()); });
-    $('#iframe').on('change', function() { save_setting('iframe', $(this).is(':checked')); });
-    $('.special.help a').on('click', function() { $('#url').val($(this).text()).trigger('blur'); });
     // Bookmark sort options
     $('#sort_delay').on('change', function() { save_setting('sort_delay', $(this).val()); });
     $('#folders_first').on('change', function() { save_setting('folders_first', $(this).is(':checked')); });
@@ -48,27 +42,6 @@ var Options = {
     $('#mobile_sub').on('change', function() { save_setting('mobile_sub', $(this).val()); });
     $('#other_sort').on('change', function() { save_setting('other_sort', $(this).val()); });
     $('#other_sub').on('change', function() { save_setting('other_sub', $(this).val()); });
-  },
-};
-
-
-//------------------------------
-// New Tab
-//------------------------------
-var NewTab = {
-  init: function() {
-    chrome.storage.sync.get(['url','iframe'], function(result) {
-      var url = result.url || 'chrome://apps/';
-      var iframe = result.iframe || false;
-      if (url.startsWith('chrome://')) {
-        chrome.tabs.create({'url': url});
-        window.close();
-      } else if (iframe) {
-        $('#iframe').attr('src', url);
-      } else {
-        window.top.location = url;
-      }
-    });
   },
 };
 
@@ -217,7 +190,7 @@ var Background = {
   },
 
   // Initialize sorting triggers
-  init_sort_triggers: function() {
+  init_triggers: function() {
     var self = this;
     chrome.bookmarks.onImportBegan.addListener(function() { console.log('Import active'); self.import_active = true; });
     chrome.bookmarks.onImportEnded.addListener(function() { console.log('Import ended'); self.import_active = false; self.sort_timer = self.sort_delay; });
@@ -274,7 +247,6 @@ var Background = {
 //------------------------------
 // Main
 //------------------------------
-if ($('#main').length) { NewTab.init(); }
 if ($('#options').length) { Options.init(); }
 if ($('#popup').length) { TabGroups.init(); }
 if ($('#background').length) { Background.init(); }

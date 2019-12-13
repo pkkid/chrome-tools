@@ -7,7 +7,6 @@
   "permissions": ["bookmarks", "management", "storage", "tabs", "topSites"],
   "options_page": "options.html",
   "background": {"page": "background.html"},
-  "chrome_url_overrides": {"newtab": "main.html"},
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": {
