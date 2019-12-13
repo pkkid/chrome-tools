@@ -212,8 +212,6 @@ input:checked + .slider:before {
   right: 22px;
 }
 
-
-
 /* Popup Window */
 #popup {
   width: 250px;
