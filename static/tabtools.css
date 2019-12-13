@@ -215,15 +215,21 @@ input:checked + .slider:before {
 
 
 /* Popup Window */
-#popup { width: 200px; }
+#popup {
+  width: 250px;
+  font-size: 14px;
+}
 #popup h2 {
   background-color: #555;
   color: #fff;
   display: block;
-  font-size: 10px;
+  font-size: 1.1em;
   font-weight: normal;
   margin: 0px;
   padding: 5px 10px;
+}
+#popup .groups {
+  min-height: 100px;
 }
 #popup .row {
   line-height: 30px;
@@ -231,14 +237,19 @@ input:checked + .slider:before {
   border-bottom: 1px solid #eee;
   user-select: none;
 }
-#popup .row .name { padding-left: 10px; }
-#popup .row .name:hover { background-color: #eee; }
+#popup .row .name {
+  padding-left: 10px;
+  cursor: pointer;
+}
+#popup .row .name:hover {
+  background-color: #eee;
+}
 #popup .row .name .mdi {
   margin-right: 5px;
   opacity: 0.8;
   font-size: 16px;
   position: relative;
-  top: 2px;
+  top: 1px;
 }
 #popup .row .actionsbtn {
   float: right;
@@ -246,28 +257,47 @@ input:checked + .slider:before {
   text-align: center;
   font-weight: bold;
   color: #aaa;
-  line-height: 32px;
+  line-height: 31px;
+  cursor: pointer;
 }
-#popup .row .actionsbtn:hover { background-color: #ddd; color: #222; }
-#popup .row .actions { padding: 3px 5px; text-align: right; }
+#popup .row .actionsbtn:hover {
+  background-color: #ddd;
+  color: #222;
+}
+#popup .row .actions {
+  padding: 3px 5px;
+  text-align: right;
+}
 #popup .row .actions,
-#popup .row .actions button { font-size: 10px; line-height: 16px; }
-#popup .loadarea:empty:before {
+#popup .row .actions button {
+  font-size: 10px;
+  line-height: 16px;
+}
+#popup .row .actions button {
+  cursor: pointer;
+}
+#popup .groups:empty:before {
   color: #aaa;
   content: 'Create a tab group below..';
   display: block;
   line-height: 35px;
   text-align: center;
+  line-height: 100px;
 }
-#popup .saverow { padding: 5px; }
-#popup .saverow button { font-size: 12px; line-height: 18px; }
+#popup .saverow {
+  padding: 5px;
+}
+#popup .saverow button {
+  line-height: 20px;
+  cursor: pointer;
+}
 #popup .saverow input {
   float: left;
   left: 0px;
   margin-right: 10px;
   position: relative;
   top: -3px;
-  width: 100px;
+  width: 150px;
   font-size: 12px;
   line-height: 18px;
   opacity: 0.5;

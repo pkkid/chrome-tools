@@ -216,8 +216,8 @@ var Background = {
     });
   },
 
-  // Initialize all background triggers
-  init_triggers: function() {
+  // Initialize sorting triggers
+  init_sort_triggers: function() {
     var self = this;
     chrome.bookmarks.onImportBegan.addListener(function() { console.log('Import active'); self.import_active = true; });
     chrome.bookmarks.onImportEnded.addListener(function() { console.log('Import ended'); self.import_active = false; self.sort_timer = self.sort_delay; });
