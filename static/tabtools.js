@@ -171,21 +171,25 @@ var Background = {
 
   init: function() {
     var self = this;
+    this.sort_timer = 1;  // Countdown to sort
+    self.import_active = false;  // True when import is occuring
+    this.read_settings();
+    this.init_triggers();
+    setInterval(function() { self.check_sort(self); }, 1000);
+  },
+
+  read_settings: function() {
+    var self = this;
+    console.log('Reading settings');
     chrome.storage.sync.get(null, function(result) {
       self.sort_delay = result.sort_delay || 45;
       self.folders_first = result.folders_first || true;
       self.sort_options = [  // Options based on starting path
-        ['/Bookmarks bar/', result.bookmarks_sub || 'none'],
-        ['/Bookmarks bar', result.bookmarks_sort || 'none'],
-        ['/Mobile bookmarks/', result.mobile_sub || 'none'],
-        ['/Mobile bookmarks', result.mobile_sort || 'none'],
+        ['/Bookmarks/', result.bookmarks_sub || 'none'],
+        ['/Bookmarks', result.bookmarks_sort || 'none'],
         ['/Other bookmarks/', result.other_sub || 'none'],
         ['/Other bookmarks', result.other_sort || 'none'],
       ];
-      self.import_active = false;  // True when import is occuring
-      self.sort_timer = 1;  // Countdown to sort
-      self.init_triggers();
-      setInterval(function() { self.sort_everything(self); }, 1000);
     });
   },
 
@@ -212,10 +216,11 @@ var Background = {
   },
 
   // Sort all bookmarks in all folders
-  sort_everything: function(self) {
+  check_sort: function(self) {
     self.sort_timer = Math.max(-1, self.sort_timer-1);
     if ((self.sort_timer == 0) && !self.import_active) {
-      console.log('Sort Everything!');
+      console.log('Sorting bookmarks');
+      self.read_settings();
       chrome.bookmarks.getTree(function(root) {
         self.iter_folders('', root[0]);
       });
@@ -237,9 +242,9 @@ var Background = {
   // Sort Folder
   sort_folder: function(path, folder) {
     // check we want to sort this folder
-    var sortby = this.get_sortby(path);  
+    var sortby = this.get_sortby(path);
     if (sortby == 'none') { return null; }
-    console.log(path, sortby, folder);
+    console.log(`Sorting "${path}" by ${sortby}`, folder);
   },
 };
 
