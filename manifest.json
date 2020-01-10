@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "Chrome Tools",
-  "short_name": "Chrome Tools",
+  "name": "Tools for Chrome",
+  "short_name": "Tools for Chrome",
   "version": "3.0",
   "description": "Tools to make using chrome better.",
   "permissions": ["bookmarks", "management", "storage", "tabs", "topSites"],

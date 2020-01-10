@@ -1,4 +1,4 @@
-# Chrome Tools
+# Tools for Chrome
 
 ## Save Pinned Tabs
 
@@ -12,7 +12,7 @@ Auto sort your bookmarks by title, created, or url.
 
 ### Legal
 
-Chrome Tools is released under the [MIT license](http://bit.ly/mit-license).
+Tools for Chrome is released under the [MIT license](http://bit.ly/mit-license).
 You *may not* redistribute this software without proper attribution.
 
 * jQuery code is [MIT Licensed](https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt). 
