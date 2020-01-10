@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Tools for Chrome",
   "short_name": "Tools for Chrome",
-  "version": "3.0",
+  "version": "2020.01.10",
   "description": "Tools to make using chrome better.",
   "permissions": ["bookmarks", "management", "storage", "tabs", "topSites"],
   "options_page": "options.html",
