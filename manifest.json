@@ -1,9 +1,9 @@
 {
   "manifest_version": 2,
-  "name": "Tools for Chrome",
-  "short_name": "Tools for Chrome",
+  "name": "PKs Tab Tools",
+  "short_name": "PKs Tab Tools",
   "version": "2020.01.10",
-  "description": "Tools to make using chrome better.",
+  "description": "PKs Tab Tools",
   "permissions": ["bookmarks", "management", "storage", "tabs", "topSites"],
   "options_page": "options.html",
   "background": {"page": "background.html"},
