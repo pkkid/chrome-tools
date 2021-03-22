@@ -1,5 +1,4 @@
 // Encoding: UTF-8
-// Chrome New Tab Options
 'use strict';
 
 var save_setting = function(key, value, callback) {
