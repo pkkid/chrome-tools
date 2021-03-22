@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "PKs Tab Tools",
   "short_name": "PKs Tab Tools",
-  "version": "2020.01.10",
+  "version": "2021.03.22",
   "description": "PKs Tab Tools",
   "permissions": ["bookmarks", "management", "storage", "tabs", "topSites"],
   "options_page": "options.html",
